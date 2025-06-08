@@ -9,10 +9,9 @@ import numpy as np
 from pydub import AudioSegment
 from tkinter import filedialog
 
-# Pygame inicializálása
 pygame.mixer.init()
 
-# Hangok betöltése
+# hangkuki
 sounds = {
     "Kick": pygame.mixer.Sound("sounds/kick.wav"),
     "Snare": pygame.mixer.Sound("sounds/snare.wav"),
@@ -22,43 +21,41 @@ sounds = {
     "E4": pygame.mixer.Sound("sounds/E4.wav")
 }
 
-# Idővonal beállítások
+# jatszocucc
 TRACKS = ["Kick", "Snare", "Hi-Hat", "Piano"]
 STEPS = 16
 BPM = 180
 STEP_DELAY = 60.0 / BPM
 
-# Globális változók
+# valtozoka
 timeline = {
     "Kick" : [False]*STEPS,
     "Snare" : [False]*STEPS,
     "Hi-Hat": [False]*STEPS,
-    "Piano": [None]*STEPS  # Most None vagy hangnevek vannak itt
+    "Piano": [None]*STEPS  
 }
 current_step = 0
 playing = False
 bpm_value = BPM
-recorded_notes = []  # [(time_in_seconds, sound_name), ...]
+recorded_notes = []
 
-# Tkinter ablak
 root = tk.Tk()
 root.title("On The Beat")
 root.configure(bg="black")
 
-# Dobszám gombok
 frame_drum = tk.Frame(root)
 frame_drum.pack(pady=10)
 
-# BPM Frame – csúszka + beviteli mező
+# bpm
 bpm_frame = tk.Frame(root, bg="black")
 bpm_frame.pack(pady=10)
 
-# Csúszka
-bpm_slider = tk.Scale(bpm_frame, from_=60, to=240, orient="horizontal", length=300, label="BPM (Csúszka)")
+# sliderbpm
+bpm_slider = tk.Scale(bpm_frame, from_=60, to=240, orient="horizontal", length=300, label="BPM")
 bpm_slider.set(BPM)
 bpm_slider.pack(side="left", padx=10)
 
-# Beviteli mező
+# inputbmp
 bpm_entry = tk.Entry(bpm_frame, width=5)
 bpm_entry.insert(0, str(BPM))
 bpm_entry.pack(side="left", padx=5)
@@ -78,7 +75,6 @@ def update_slider_from_entry(event=None):
     except:
         pass
 
-# Események hozzárendelése
 bpm_slider.config(command=update_entry_from_slider)
 bpm_entry.bind("<FocusOut>", update_slider_from_entry)
 bpm_entry.bind("<Return>", update_slider_from_entry)
@@ -90,11 +86,10 @@ for name in ["Kick", "Snare", "Hi-Hat"]:
     btn = tk.Button(frame_drum, text=name, width=10, command=lambda n=name: play_sound(n))
     btn.pack(side=tk.LEFT, padx=5)
 
-# Piano gomb
+# zong
 btn_piano = tk.Button(frame_drum, text="Piano", width=10, command=lambda: play_sound("C4"))
 btn_piano.pack(side=tk.LEFT, padx=5)
 
-# Idővonal
 frame_timeline = tk.Frame(root)
 frame_timeline.pack(pady=20)
 
@@ -142,32 +137,32 @@ def set_piano_note(note, step, window):
     index = TRACKS.index("Piano")
     timeline_buttons[index][step].config(bg="orange", text=note)
     window.destroy()
-# Aktivált cellák frissítése
+
 def toggle_step(track, step, button=None):
     index = TRACKS.index(track)
     if track == "Piano":
         if button == "right":
-            # Törlés
+            # torol
             timeline[track][step] = None
             timeline_buttons[index][step].config(bg="lightgray", text="")
         else:
-            # Hang választás
+            # zongivalasztas
             choose_piano_note(step)
     else:
         if button == "right":
-            # Inaktiválás
+            # ez mar nemtom mi
             timeline[track][step] = False
             timeline_buttons[index][step].config(bg="lightgray")
         else:
-            # Aktiválás
+            # eztse
             timeline[track][step] = not timeline[track][step]
             color = "green" if timeline[track][step] else "lightgray"
             timeline_buttons[index][step].config(bg=color)
 
-# Lejátszás gomb
+# play
 play_button = tk.Button(root, text="▶️ Indítás", width=15)
 
-# Csúszka az indulási pozíció beállításához
+# honnan jatszos lejatszos
 slider_frame = tk.Frame(root, bg="black")
 slider_frame.pack(pady=10)
 
@@ -185,7 +180,6 @@ def toggle_play():
     if playing:
         current_step = position_slider.get()
 
-        # BPM beolvasása
         try:
             bpm_value = int(bpm_slider.get())
         except:
@@ -200,7 +194,7 @@ play_button.config(command=toggle_play)
 play_button.pack(pady=10)
 
 
-# Loop függvény
+# lup
 def play_loop():
     global current_step, playing, bpm_value, recorded_notes
     start_time = time.time()
@@ -218,9 +212,9 @@ def play_loop():
             recorded_notes.append((elapsed, piano_note))
 
         current_step = (current_step + 1) % STEPS
-        time.sleep(max(0, 60.0 / bpm_value - 0.001))  # Kis kompenzáció
+        time.sleep(max(0, 60.0 / bpm_value - 0.001))  
 
-# Billentyűzet támogatás
+# billentyuzetes vergodes
 def key_press(event):
     if event.char in key_map:
         sound_name = key_map[event.char]
@@ -231,13 +225,12 @@ def key_press(event):
         play_sound(note_name)
         add_piano_note(note_name, current_step)
 
-# Piano hang hozzáadása az aktuális pozícióhoz (opcionális)
+# afsasfasf
 def add_piano_note(note, step):
     timeline["Piano"][step] = True
     timeline_buttons[3][step].config(bg="orange")
 
 def get_sound_array(sound):
-    # Egy pygame.mixer.Sound objektum átalakítása numpy tömbbé
     from io import BytesIO
     with BytesIO() as b:
         with wave.open(b, 'wb') as wf:
@@ -270,14 +263,14 @@ def save_playback_to_wav():
 
 def apply_delay(sound_array, delay_ms=100, decay=0.5):
     delay_samples = int(delay_ms * 44100 / 1000)
-    # Konvertáljuk float32-ra dolgozás közben
+    
     sound_float = sound_array.astype(np.float32)
     output = np.zeros(len(sound_float) + delay_samples, dtype=np.float32)
     
     output[:len(sound_float)] += sound_float
     output[delay_samples:] += decay * sound_float
     
-    # Visszaalakítjuk int16-ra
+    
     return np.clip(output, -32768, 32767).astype(np.int16)
 
 sound_array = get_sound_array(sounds["C4"])
@@ -285,13 +278,12 @@ delayed_array = apply_delay(sound_array, delay_ms=200)
 delayed_sound = array_to_audiosegment(delayed_array)
 delayed_sound.export("C4_delay.wav", format="wav")
 
-# Mentés WAV-be gomb
-export_button = tk.Button(root, text="💾 Exportálás WAV-be", width=25,
+# xport
+export_button = tk.Button(root, text="💾 Exportálás (.wav)", width=25,
                           command=save_playback_to_wav,
                           bg="#444", fg="white")
 export_button.pack(pady=10)
 
 root.bind("<Key>", key_press)
 
-# Program indítása
 root.mainloop()
